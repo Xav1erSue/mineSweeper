@@ -1,8 +1,14 @@
 <template>
-  <router-view></router-view>
+  <div id="container">
+    <header>MineSweeper</header>
+    <hr />
+    <router-view></router-view>
+  </div>
+  <footer>© 2021 Xav1erSue，All rights reserved.</footer>
 </template>
 
 <style lang="scss">
+// 全局配色
 @media (prefers-color-scheme: dark) {
   :root {
     --back-ground-color: #000000;
@@ -21,15 +27,44 @@
 }
 body {
   background: var(--back-ground-color);
+  margin: 0 auto;
+  min-width: 460px;
+  max-width: 600px;
 }
 #app {
   background: var(--base-color);
-  width: 600px;
   margin: 0 auto;
+}
+header {
+  text-align: center;
+  color: var(--block-color);
+  font-size: 200%;
+}
+#container {
   padding: 20px;
+}
+hr {
+  border: 1px solid var(--block-color);
+  margin-bottom: 20px;
+}
+footer {
+  text-align: center;
+  background: var(--block-color);
+  padding: 5px 0;
+  margin-top: 20px;
+  margin-bottom: 0;
+  color: var(--base-color);
+}
+// 已下为项目顶层样式
+.motd {
+  margin: 0 auto;
+  text-align: center;
+  padding: 5px 0;
+  color: var(--block-color);
 }
 .btn {
   text-decoration: none;
+  text-align: center;
   color: var(--block-font-color);
   padding: 5px 10px;
   background: var(--block-color);

@@ -15,10 +15,10 @@
     </div>
   </div>
   <div id="window">
-    <div class="columns" v-for="columnIndex of 9" :key="columnIndex">
+    <div class="columns" v-for="columnIndex of 10" :key="columnIndex">
       <div
         class="rowBlocks"
-        v-for="rowIndex of 9"
+        v-for="rowIndex of 10"
         :key="rowIndex"
         @click="clickEvent($event)"
       ></div>
@@ -70,15 +70,15 @@ export default {
 #window {
   box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
     rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
-  width: calc(20 * 9px);
+  width: calc(25 * 10px);
   margin: 10px auto;
   .columns {
     margin: 0 auto;
     display: flex;
     align-items: center;
     .rowBlocks {
-      width: 19px;
-      height: 18px;
+      width: 24px;
+      height: 23px;
       background: var(--block-color);
       border: 1px solid var(--base-color);
     }

@@ -7,19 +7,19 @@ const routes = [
     component: () => import("../views/home.vue"),
   },
   {
-    path: "/9*9",
-    name: "Nine",
-    component: () => import("../views/nine.vue"),
+    path: "/easy",
+    name: "Easy",
+    component: () => import("../views/easy.vue"),
   },
   {
-    path: "/10*10",
-    name: "Ten",
-    component: () => import("../views/ten.vue"),
+    path: "/middle",
+    name: "Middle",
+    component: () => import("../views/middle.vue"),
   },
   {
-    path: "/15*15",
-    name: "Fifty",
-    component: () => import("../views/fifty.vue"),
+    path: "/hard",
+    name: "Hard",
+    component: () => import("../views/hard.vue"),
   },
 ];
 
