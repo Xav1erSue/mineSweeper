@@ -25,6 +25,7 @@
     --block-color: #61a1a1;
   }
 }
+
 body {
   background: var(--back-ground-color);
   margin: 0 auto;

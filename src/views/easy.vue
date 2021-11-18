@@ -1,7 +1,7 @@
 <template>
   <div id="topbar">
     <router-link to="/" class="btn">Back</router-link>
-    <div class="motd" v-show="seen">click to start</div>
+    <div class="motd" v-show="seenMotd">click to start</div>
     <div class="btn" @click="reset">Reset</div>
   </div>
   <div id="info">
@@ -12,7 +12,7 @@
       Marked:<span>{{ marks }}</span>
     </div>
     <div>
-      Mines Left:<span>{{ minesLeft }}</span>
+      Mines Left:<span>{{ 10 - marks }}</span>
     </div>
   </div>
   <!-- 扫雷窗口 -->
@@ -26,43 +26,75 @@
         @click.right="mark(Xindex, Yindex)"
         @click.left="open(Xindex, Yindex)"
       >
-        <span v-show="0">{{ this.blocks[Xindex][Yindex].isMine }}</span>
-        <span v-show="this.blocks[Xindex][Yindex].gg">💣</span>
+        <!-- <span v-show="!(this.blocks[Xindex][Yindex].isMine && this.gg)">{{
+          this.blocks[Xindex][Yindex].minesNearBy
+        }}</span> -->
+        <span v-show="this.blocks[Xindex][Yindex].isMine && this.gg">💣</span>
         <span v-show="this.blocks[Xindex][Yindex].marked">🚩</span>
       </div>
     </div>
   </div>
 </template>
 <script>
-import { setRandomArray, setEmptyArray, searchNearBy } from "../utils/setArray";
+import {
+  setRandomMines,
+  setEmptyArray,
+  computeNearBy,
+} from "../utils/setArray";
 export default {
   data() {
     return {
-      start: 0,
-      seen: true,
-      clickTimes: 0,
-      marks: 0,
-      minesLeft: 10 - this.marks,
-      blocks: [],
+      n: 9,
+      start: 0, // 标记游戏是否正在进行
+      seenMotd: true, // 标记motd是否显示
+      clickTimes: 0, // 记录点击次数
+      marks: 0, // 记录标记个数
+      blocks: [], // 每个方格独立信息
+      gg: 0, // 标记游戏是否结束
+      // 样式
+      styles: [
+        {
+          // 点开空白
+          background: "#eee",
+          "box-shadow":
+            "rgb(204, 21n, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset",
+        },
+        {
+          background: "#2E8B57",
+        },
+        {
+          background: "#DC143C",
+        },
+      ],
     };
   },
   methods: {
     open(x, y) {
-      // 第一次点开时创建地雷
-      if (this.clickTimes == 0) {
+      // 1. 第一次点开：生成地雷
+      if (this.start == 0 && this.clickTimes == 0) {
         this.setMines(x, y);
-        this.seen = false;
+        this.blocks[x][y].clickAble = 0;
+        this.blocks[x][y].styles = this.styles[0];
+        this.seenMotd = false;
         this.start = 1;
+        this.clickTimes++;
+        return;
       }
-      this.clickTimes++;
-      // 点到地雷就GG
-      if (this.blocks[x][y].isMine == 1) {
+      // 2. 点到没有被标记的地雷：GG
+      if (this.blocks[x][y].isMine == 1 && this.blocks[x][y].clickAble == 1) {
+        this.blocks[x][y].styles = this.styles[2];
         this.GG();
         return;
       }
-      // 被点开了
-      console.log("running");
-      searchNearBy(this.blocks, x, y);
+      // 点到空白
+      if (this.blocks[x][y].isMine != 1 && this.blocks[x][y].clickAble == 1) {
+        this.chainOpen(x, y);
+        this.clickTimes++;
+      }
+    },
+    openBlankBlock(x, y) {
+      this.blocks[x][y].clickAble = 0;
+      this.blocks[x][y].styles = this.styles[0];
     },
     mark(x, y) {
       event.preventDefault();
@@ -70,41 +102,97 @@ export default {
       if (this.start == 1) {
         this.clickTimes++;
         if (this.blocks[x][y].marked == 0 && this.marks < 10) {
+          // 没有被标记，标记数量少于10：标记该方块
           this.blocks[x][y].marked = 1;
-          this.blocks[x][y].styles = { background: "#d1ebeb" };
+          this.blocks[x][y].clickAble = 0;
+          this.blocks[x][y].styles = this.styles[1];
           this.marks++;
         } else if (this.blocks[x][y].marked == 1) {
+          // 被标记：取消标记
           this.blocks[x][y].marked = 0;
+          this.blocks[x][y].clickAble = 0;
           this.blocks[x][y].styles = {};
           this.marks--;
         } else {
-          console.log("err");
+          // 其他情况（已经标记十个）
+          console.error("you can't mark any more!");
         }
       }
     },
     setMines(x, y) {
-      // 9x9的方格定义10个雷
-      let minesArr = setRandomArray(9, 10, x, y);
-      for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
+      // nxn的方格定义10个雷
+      let minesArr = setRandomMines(this.n, 10, x, y);
+      for (let i = 0; i < this.n; i++) {
+        for (let j = 0; j < this.n; j++) {
           this.blocks[i][j].isMine = minesArr[i][j];
           if (minesArr[i][j] == 1) {
             this.blocks[i][j].styles = { color: "red" };
           }
         }
       }
+      for (let i = 0; i < this.n; i++) {
+        for (let j = 0; j < this.n; j++) {
+          if (this.blocks[i][j].isMine != 1) {
+            this.blocks[i][j].minesNearBy = computeNearBy(
+              this.blocks,
+              i,
+              j,
+              this.n
+            );
+          } else {
+            this.blocks[i][j].minesNearBy = -1;
+          }
+        }
+      }
+    },
+    chainOpen(x, y) {
+      if (this.blocks[x][y].minesNearBy != 0) {
+        this.openBlankBlock(x, y);
+        return;
+      }
+      this.dfs(x, y);
+      for (let i = 0; i < this.n; i++) {
+        for (let j = 0; j < this.n; j++) {
+          this.blocks[i][j].tempFlag = 0;
+        }
+      }
+    },
+
+    dfs(x, y) {
+      this.openBlankBlock(x, y);
+      let directions = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ];
+      for (let i = 0; i < 4; i++) {
+        let tx = x + directions[i][0];
+        let ty = y + directions[i][1];
+        if (tx < 0 || tx >= this.n || ty < 0 || ty >= this.n) continue; // 越界了直接跳过该轮
+        if (
+          this.blocks[tx][ty].minesNearBy == 0 &&
+          this.blocks[tx][ty].tempFlag == 0
+        ) {
+          this.blocks[tx][ty].tempFlag = 1;
+          this.dfs(tx, ty);
+        }
+      }
+      return;
     },
     GG() {
+      this.gg = 1;
       alert("GAME OVER");
-      this.reset();
     },
     reset() {
       // 初始化
-      this.seen = true;
+      this.start = 0;
+      this.seenMotd = true;
       this.clickTimes = 0;
       this.minesLeft = 10;
       this.marked = 0;
-      this.blocks = setEmptyArray(9);
+      this.blocks = setEmptyArray(this.n);
+      this.gg = 0;
     },
   },
   created() {
