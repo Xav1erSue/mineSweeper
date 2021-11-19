@@ -1,4 +1,4 @@
-export { setRandomMines, setEmptyArray, computeNearBy };
+export { setRandomMines, setEmptyArray, computeNearBy, judgeColor };
 
 // 输入矩阵阶数n，mines个地雷和初始坐标x0,y0
 function setRandomMines(n, mines, x0, y0) {
@@ -25,14 +25,15 @@ function setEmptyArray(n) {
   for (let i = 0; i < n; i++) {
     arr[i] = new Array(n).fill(0);
   }
-  for (let i = 0; i < 9; i++) {
-    for (let j = 0; j < 9; j++) {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
       arr[i][j] = {
         tempFlag: 0, // 下面遍历时用到的标记变量
         minesNearbBy: 0, // 记录该方块周围八个格子的地雷数
         isMine: 0, // 记录该方块是否是地雷
         marked: 0, // 记录该方块是否被标记
-        clickAble: 1, //记录方块是否可以点击
+        clickAble: 1, // 记录方块是否可以点击
+        shown: 0, // 记录方块是否被边缘显露
       };
     }
   }
@@ -60,4 +61,28 @@ function computeNearBy(arr, x, y, n) {
     if (arr[tx][ty].isMine == 1) sum++;
   }
   return sum;
+}
+
+function judgeColor(num) {
+  switch (num) {
+    case 1:
+      return "#DC143C";
+    case 2:
+      return "#DA70D6";
+    case 3:
+      return "#8B008B";
+    case 4:
+      return "#4B0082";
+    case 5:
+      return "#6A5ACD";
+    case 6:
+      return "#2F4F4F";
+    case 7:
+      return "#3CB371";
+    case 8:
+      return "#FFA500";
+    default:
+      console.error("Invalid Number!");
+      return "#fff";
+  }
 }

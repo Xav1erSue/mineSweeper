@@ -1,24 +1,17 @@
-# minesweeper
+# 扫雷MineSweeper
 
-## Project setup
-```
-npm install
-```
+> 使用`Vue`+`VueRouter`实现
+>
+> 成品demo:[MineSweeper](http://xav1er.com/minesweeper)
 
-### Compiles and hot-reloads for development
-```
+## 1. 运行项目
+
+```bash
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
+## 2. 构建项目
+
+```bash
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
