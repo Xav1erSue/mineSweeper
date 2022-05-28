@@ -2,7 +2,7 @@
 
 > 使用`Vue`+`VueRouter`实现
 >
-> 成品demo:[MineSweeper](http://xav1er.com/minesweeper)
+> 成品demo:[MineSweeper](https://game.xav1er.com/minesweeper)
 
 >特性：
 >
